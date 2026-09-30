@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Course Planner</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f6f7fb;--card:#fff;--ink:#1f2433;--mute:#6b7285;--line:#e3e6ef;--bio:#a9d18e;--phy:#bdd7ee;--mat:#adb9ca;--che:#ffd966;--eng:#ff5b5b;--ger:#f4b183;--bad:#d6264a;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#171a26;--card:#20243a;--ink:#eef0f8;--mute:#9aa1b8;--line:#33385a;--bad:#ff7a93}}
+:root[data-theme="dark"]{--bg:#171a26;--card:#20243a;--ink:#eef0f8;--mute:#9aa1b8;--line:#33385a;--bad:#ff7a93}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:400 16px/1.5 Nunito,system-ui,sans-serif}
+main{max-width:720px;margin:0 auto;padding:20px 16px 48px}
+h1,h2{font-weight:900;margin:0}
+h2{font-size:1.15rem;margin:28px 0 10px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px}
+#alerts .a{background:var(--bad);color:#fff;border-radius:12px;padding:10px 14px;margin-bottom:8px;font-weight:700}
+.hero{border-radius:20px;padding:22px;color:#1f2433;background:var(--mat);margin-top:12px}
+.hero small{font-weight:700;opacity:.75}
+.hero .subj{font-size:2.4rem;font-weight:900;line-height:1.1;margin:2px 0 6px}
+.hero .when{font-weight:700}
+.hero .count{font-size:1.6rem;font-weight:900;margin-top:10px;font-variant-numeric:tabular-nums}
+.hero .hw{margin-top:12px;padding-top:10px;border-top:2px solid rgba(0,0,0,.15);font-weight:700}
+form{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+form .full{grid-column:1/-1}
+input,select,button{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:9px 11px;min-width:0}
+button{cursor:pointer;font-weight:700}
+button.go{background:var(--ink);color:var(--bg);border:0}
+:focus-visible{outline:3px solid #4c8dff;outline-offset:2px}
+ul{list-style:none;margin:0;padding:0}
+.hwi{display:flex;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
+.hwi:last-child{border:0}
+.hwi input{width:20px;height:20px;flex:none}
+.hwi .t{flex:1}
+.hwi.done .t b{text-decoration:line-through;opacity:.5}
+.tag{display:inline-block;border-radius:8px;padding:0 8px;font-size:.8rem;font-weight:700;color:#1f2433;margin-right:6px}
+.due{font-size:.85rem;color:var(--mute)}
+.due.late{color:var(--bad);font-weight:700}
+.x{background:none;border:0;color:var(--mute);padding:4px 8px}
+.day{display:flex;gap:12px;padding:8px 0;border-bottom:1px solid var(--line)}
+.day:last-child{border:0}
+.day.today{background:color-mix(in srgb,var(--che) 22%,transparent);border-radius:10px;padding-left:8px;padding-right:8px}
+.day .d{width:44px;font-weight:900;flex:none}
+.day .ls{flex:1;display:flex;flex-wrap:wrap;gap:6px}
+.empty{color:var(--mute)}
+#ask{margin-top:12px}
+#ask .ask{border:2px solid var(--ink)}
+#ask form{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+#ask input{flex:1 1 200px}
+label{display:flex;flex-direction:column;gap:2px}
+nav{display:flex;gap:6px;margin-top:14px}
+.joinbtn{display:block;text-align:center;background:var(--ink);color:var(--bg);font-weight:900;font-size:1.1rem;border-radius:14px;padding:14px;text-decoration:none;margin-top:12px}
+.absbtn{margin-top:12px;width:100%;background:rgba(255,255,255,.55);border:2px solid rgba(0,0,0,.25);color:#1f2433}
+.row2{display:flex;gap:8px;margin-top:12px}
+.row2>.absbtn,.row2>button{margin-top:0;flex:1;width:auto}
+textarea{font:inherit;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:9px 11px;width:100%;min-height:120px;margin-bottom:8px}
+.sg{display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:10px 0;border-bottom:1px solid var(--line)}
+.sg .full{grid-column:1/-1}
+nav button{flex:1}
+nav button[aria-pressed=true]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+#view{position:fixed;inset:0;background:var(--bg);z-index:10;display:flex;flex-direction:column;gap:8px;padding:calc(12px + env(safe-area-inset-top,0px)) 12px calc(12px + env(safe-area-inset-bottom,0px))}
+#view[hidden]{display:none}
+#vbody{flex:1;min-height:0;overflow:auto}
+#vbody iframe{width:100%;height:100%;border:0;background:#fff}
+#vbody img{max-width:100%}
+.top{display:flex;justify-content:space-between;align-items:center;gap:8px}
+</style>
+</head>
+<body>
+<main>
+<div class="top"><h1>My courses</h1><div class="row2" style="margin:0"><button id="theme" aria-label="Change theme">Auto</button><button id="notif">Notifications</button></div></div>
+<p class="due" id="sync" aria-live="polite"></p>
+<div id="alerts" aria-live="polite"></div>
+
+<nav aria-label="Sections"><button data-t="plan" aria-pressed="true">Planner</button><button data-t="docs" aria-pressed="false">Documents</button><button data-t="ann" aria-pressed="false">Announcements</button><button data-t="tools" aria-pressed="false">Tools</button></nav>
+<div id="planTab">
+<div id="join"></div>
+<section id="ask" aria-live="polite" hidden></section>
+<section class="hero" id="hero" aria-live="off"></section>
+<h2>Next 7 days</h2>
+<div class="card"><ul id="wk"></ul></div>
+
+<h2>Add homework</h2>
+<div class="card">
+<form id="f">
+<select id="subj" aria-label="Subject"></select>
+<select id="dueMode" aria-label="Due"><option value="next">Due at next lesson</option><option value="date">Pick a date</option></select>
+<input id="what" class="full" placeholder="What do you need to do?" required>
+<input id="date" type="date" class="full" hidden aria-label="Due date">
+<button class="go full">Add homework</button>
+</form>
+</div>
+
+<h2>Homework <span id="streak" class="due"></span></h2>
+<div class="card"><ul id="hwl"></ul></div>
+
+<h2>Exams</h2>
+<div class="card">
+<form id="xf" style="margin-bottom:8px">
+<select id="xs" aria-label="Subject"></select>
+<input id="xd" type="date" required aria-label="Exam date">
+<input id="xw" class="full" placeholder="Exam name (e.g. Mid-term)">
+<button class="go full">Add exam</button>
+</form>
+<ul id="exl"></ul>
+</div>
+
+<div class="top"><h2>This week</h2><button id="editS">Edit schedule</button></div>
+<div class="card" id="week"></div>
+<p class="due" id="links"></p>
+<div class="card" id="sched" hidden style="margin-top:10px">
+<ul id="sl"></ul>
+<form id="sf" style="margin-top:12px">
+<select id="ld" aria-label="Day"><option value="6">Saturday</option><option value="0">Sunday</option><option value="1">Monday</option><option value="2">Tuesday</option><option value="3">Wednesday</option><option value="4">Thursday</option><option value="5">Friday</option></select>
+<input id="lsub" placeholder="Subject" required aria-label="Subject">
+<label class="due">Starts<input id="ls" type="time" required></label>
+<label class="due">Ends (optional)<input id="le" type="time"></label>
+<button class="go full">Add lesson</button>
+</form>
+</div>
+</div>
+
+<div id="docsTab" hidden>
+<h2>Add a document</h2>
+<div class="card">
+<form id="df">
+<select id="dsub" aria-label="Subject"></select>
+<input id="dname" placeholder="Name (optional)" aria-label="Name">
+<input id="dfile" type="file" accept="application/pdf,image/*" multiple required class="full" aria-label="PDF or image">
+<button class="go full">Add to documents</button>
+</form>
+<p class="due" id="dnote">Files are stored on this device and browser only.</p>
+</div>
+<div class="top"><h2>Your documents</h2><select id="dfil" aria-label="Filter by subject"></select></div>
+<div class="card"><ul id="dlist"></ul></div>
+</div>
+
+<div id="toolsTab" hidden>
+<h2>Study timer</h2>
+<div class="card">
+<form id="tf"><select id="tsub" aria-label="Subject"></select><button class="go" id="tgo" type="button">Start 25 min</button></form>
+<div id="tclock" style="background:var(--phy);color:#1f2433;border-radius:14px;margin-top:10px;padding:14px;text-align:center;font-size:2rem;font-weight:900;font-variant-numeric:tabular-nums">25:00</div>
+<ul id="tlog"></ul>
+<p class="due">Keep this page open while the timer runs.</p>
+</div>
+<h2>Grades</h2>
+<div class="card">
+<form id="gf"><select id="gsub" aria-label="Subject"></select><input id="gname" placeholder="Test name" required>
+<input id="gs" type="number" step="any" min="0" placeholder="Score" required><input id="gm" type="number" step="any" min="1" placeholder="Out of" required>
+<button class="go full">Add grade</button></form><ul id="gl"></ul>
+</div>
+<h2>Backup</h2>
+<div class="card">
+<textarea id="bk" placeholder="Export puts your data here. To restore, paste a backup here and tap Restore."></textarea>
+<div class="row2"><button id="bexp" class="go">Export</button><button id="bimp">Restore</button></div>
+<p class="due" id="bnote">Documents are not included in the backup.</p>
+</div>
+</div>
+
+<div id="annTab" hidden>
+<h2>Paste an announcement</h2>
+<div class="card">
+<textarea id="atext" placeholder="Paste what your teacher sent, e.g. 'Physics: finish worksheet 4 by Monday. Chemistry test on 14 October.'" aria-label="Announcement"></textarea>
+<button class="go" id="aread" style="width:100%">Find homework and exams</button>
+<p class="due" id="astat" aria-live="polite"></p>
+</div>
+<div id="sugbox" hidden>
+<h2>Found in the announcement</h2>
+<div class="card"><ul id="sgl"></ul><button class="go" id="sadd" style="width:100%;margin-top:10px">Add selected</button></div>
+</div>
+</div>
+
+<div id="view" hidden>
+<div class="top"><b id="vtitle"></b><button id="vclose">Close</button></div>
+<div id="vbody"></div>
+</div>
+</main>
+
+<script>
+const COL={Biology:'--bio',Physics:'--phy',Math:'--mat',Chemistry:'--che',English:'--eng',German:'--ger'};
+// day: 0=Sun … 6=Sat  |  times in 24h
+const DEFAULT_LESSONS=[
+{d:6,s:'English',h:12,m:30},{d:6,s:'Biology',h:15,m:30},
+{d:0,s:'Chemistry',h:18,m:0},
+{d:1,s:'Math',h:16,m:30},
+{d:2,s:'German',h:15,m:15},{d:2,s:'Physics',h:18,m:0},
+{d:3,s:'Math',h:20,m:0}
+];
+let LESSONS=DEFAULT_LESSONS;
+try{const s=JSON.parse(localStorage.getItem('lessons')||'null');if(Array.isArray(s))LESSONS=s}catch(e){}
+const DN=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+const $=id=>document.getElementById(id);
+const col=s=>getComputedStyle(document.documentElement).getPropertyValue(COL[s]||'--mat');
+const fmt=(h,m)=>{const ap=h>=12?'pm':'am';return ((h+11)%12+1)+(m?':'+String(m).padStart(2,'0'):'')+ap};
+const range=l=>fmt(l.h,l.m)+(l.eh!=null?'–'+fmt(l.eh,l.em||0):'');
+
+let hw=[];
+try{hw=JSON.parse(localStorage.getItem('hw')||'[]')}catch(e){}
+const save=()=>{try{localStorage.setItem('hw',JSON.stringify(hw))}catch(e){}};
+
+function occurrences(from){ // upcoming lesson dates for the next 8 days
+  const out=[];
+  for(let i=0;i<8;i++){
+    const day=new Date(from.getFullYear(),from.getMonth(),from.getDate()+i);
+    LESSONS.filter(l=>l.d===day.getDay()).forEach(l=>{
+      const t=new Date(day.getFullYear(),day.getMonth(),day.getDate(),l.h,l.m);
+      if(t>from&&!cancelled.includes(akey(l.s,t)))out.push({...l,t});
+    });
+  }
+  return out.sort((a,b)=>a.t-b.t);
+}
+const nextOf=s=>occurrences(new Date()).find(o=>o.s===s);
+const nextAny=()=>occurrences(new Date())[0];
+const dayLabel=t=>{
+  const n=new Date(),a=new Date(n.getFullYear(),n.getMonth(),n.getDate()),b=new Date(t.getFullYear(),t.getMonth(),t.getDate());
+  const diff=Math.round((b-a)/864e5);
+  return diff===0?'Today':diff===1?'Tomorrow':DN[t.getDay()];
+};
+
+// subject dropdowns are filled from the schedule (see fillSubj)
+$('dueMode').onchange=()=>{$('date').hidden=$('dueMode').value!=='date';$('date').required=!$('date').hidden};
+
+$('f').onsubmit=e=>{
+  e.preventDefault();
+  const s=$('subj').value;let due;
+  if($('dueMode').value==='next'){const n=nextOf(s);due=n?n.t.getTime():Date.now()+864e5}
+  else due=new Date($('date').value+'T23:59').getTime();
+  hw.push({id:Date.now(),s,w:$('what').value.trim(),due,done:false});
+  save();$('what').value='';render();
+};
+
+let absent=[];
+try{absent=JSON.parse(localStorage.getItem('absent')||'[]')}catch(e){}
+const saveAbs=()=>{try{localStorage.setItem('absent',JSON.stringify(absent.slice(-60)))}catch(e){}};
+const akey=(s,t)=>s+'|'+new Date(t).getTime();
+const isAbs=n=>absent.includes(akey(n.s,n.t))||cancelled.includes(akey(n.s,n.t));
+let lastHead='';
+function renderHero(){
+  const n=nextAny(),h=$('hero');
+  if(!n){h.innerHTML='<div class="subj">No lessons</div>';lastHead='';return}
+  h.style.background=col(n.s);
+  const ms=n.t-Date.now(),d=Math.floor(ms/864e5),hr=Math.floor(ms%864e5/36e5),mi=Math.floor(ms%36e5/6e4),se=Math.floor(ms%6e4/1e3);
+  const cd=(d?d+'d ':'')+hr+'h '+String(mi).padStart(2,'0')+'m '+String(se).padStart(2,'0')+'s';
+  const due=hw.filter(x=>!x.done&&x.s===n.s),ab=isAbs(n);
+  const head=`<small>${ab?'Next lesson (marked absent, no reminders)':'Next lesson'}</small><div class="subj">${n.s}</div>
+  <div class="when">${dayLabel(n.t)}, ${range(n)}</div><div class="count">in <span id="cd"></span></div>
+  <div class="hw">${due.length?'Homework to have ready: '+due.map(x=>x.w).join(', '):'No homework for this lesson.'}</div>
+  <div class="row2"><button id="absBtn" class="absbtn">${ab?"I'll be there":"I'll be absent"}</button><button id="canBtn" class="absbtn">Lesson cancelled</button></div>`;
+  if(head!==lastHead){h.innerHTML=head;lastHead=head}
+  $('cd').textContent=cd;
+}
+$('hero').onclick=e=>{
+  const n=nextAny();if(!n)return;
+  const k=akey(n.s,n.t);
+  if(e.target.closest('#absBtn')){absent=absent.includes(k)?absent.filter(x=>x!==k):[...absent,k];saveAbs()}
+  else if(e.target.closest('#canBtn')){cancelled.push(k);saveCan()}
+  else return;
+  lastHead='';render();
+};
+
+function renderHw(){
+  const l=$('hwl');
+  if(!hw.length){l.innerHTML='<li class="empty">Nothing yet. Add your first homework above.</li>';return}
+  const sorted=[...hw].sort((a,b)=>a.done-b.done||a.due-b.due);
+  l.innerHTML=sorted.map(x=>{
+    const late=!x.done&&x.due<Date.now(),dt=new Date(x.due);
+    const txt=(late?'Overdue · ':'Due ')+dayLabel(dt)+' '+dt.toLocaleDateString(undefined,{day:'numeric',month:'short'});
+    return `<li class="hwi ${x.done?'done':''}"><input type="checkbox" data-c="${x.id}" ${x.done?'checked':''} aria-label="Done">
+    <div class="t"><span class="tag" style="background:${col(x.s)}">${x.s}</span><b>${esc(x.w)}</b><div class="due ${late?'late':''}">${txt}</div></div>
+    <button class="x" data-x="${x.id}" aria-label="Delete">✕</button></li>`}).join('');
+  l.querySelectorAll('[data-c]').forEach(b=>b.onchange=()=>{const x=hw.find(h=>h.id==b.dataset.c);x.done=b.checked;x.at=b.checked?Date.now():null;save();render()});
+  l.querySelectorAll('[data-x]').forEach(b=>b.onclick=()=>{hw=hw.filter(h=>h.id!=b.dataset.x);save();render()});
+}
+const esc=s=>s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+function renderWeek(){
+  const t=new Date().getDay();
+  $('week').innerHTML=[6,0,1,2,3,4,5].map(d=>{
+    const ls=LESSONS.filter(l=>l.d===d);
+    return `<div class="day ${d===t?'today':''}"><div class="d">${DN[d]}</div><div class="ls">${
+      ls.length?ls.map(l=>`<span class="tag" style="background:${col(l.s)}">${l.s} ${range(l)}</span>`).join(''):'<span class="empty">Free</span>'}</div></div>`}).join('');
+}
+
+function renderAlerts(){
+  const now=Date.now(),msgs=[];
+  hw.filter(x=>!x.done).forEach(x=>{
+    if(x.due<now)msgs.push(`Overdue: ${x.s} – ${esc(x.w)}`);
+    else if(x.due-now<864e5)msgs.push(`Due within 24h: ${x.s} – ${esc(x.w)}`);
+  });
+  ex.forEach(x=>{const d=daysTo(x.date);if(d>=0&&d<=7)msgs.push(`${esc(x.s)} exam ${d===0?'is today':d===1?'is tomorrow':'in '+d+' days'}: ${esc(x.w)}`)});
+  const n=nextAny();
+  const shown=[...msgs];
+  if(n&&n.t-now<36e5&&!isAbs(n))shown.unshift(lessonText(n));
+  $('alerts').innerHTML=shown.map(m=>`<div class="a">${m}</div>`).join('');
+  return msgs;
+}
+
+// notifications (only work if your browser allows them for this page)
+$('notif').onclick=async()=>{
+  try{const p=await Notification.requestPermission();$('notif').textContent=p==='granted'?'Notifications on':'Notifications blocked'}
+  catch(e){$('notif').textContent='Not supported here'}
+};
+const sent=new Set();
+function notify(){
+  try{
+    if(Notification.permission!=='granted')return;
+    renderAlerts().forEach(m=>{if(!sent.has(m)){sent.add(m);new Notification('Course planner',{body:m.replace(/&amp;/g,'&')})}});
+  }catch(e){}
+}
+
+// after each lesson, ask what the homework is (lessons without an end time are assumed to last 1h)
+let asked=[];
+try{asked=JSON.parse(localStorage.getItem('asked')||'[]')}catch(e){}
+const saveAsked=()=>{try{localStorage.setItem('asked',JSON.stringify(asked.slice(-60)))}catch(e){}};
+const endOf=(l,day)=>new Date(day.getFullYear(),day.getMonth(),day.getDate(),l.eh??l.h+1,l.eh!=null?(l.em||0):l.m);
+function pending(){
+  const now=new Date(),out=[];
+  for(let i=-2;i<=0;i++){
+    const day=new Date(now.getFullYear(),now.getMonth(),now.getDate()+i);
+    LESSONS.filter(l=>l.d===day.getDay()).forEach(l=>{
+      const end=endOf(l,day),key=l.s+'|'+day.toDateString();
+      if(end<=now&&!asked.includes(key)&&!isAbs({s:l.s,t:new Date(day.getFullYear(),day.getMonth(),day.getDate(),l.h,l.m)}))out.push({l,end,key});
+    });
+  }
+  return out.sort((a,b)=>a.end-b.end)[0];
+}
+function renderAsk(){
+  const p=pending(),a=$('ask');
+  if(!p){a.hidden=true;a.innerHTML='';a.dataset.k='';return}
+  if(a.dataset.k===p.key)return; // keep what you're typing
+  a.dataset.k=p.key;a.hidden=false;
+  a.innerHTML=`<div class="card ask"><b>${p.l.s} just finished.</b> What's the homework?
+  <form id="af"><input id="aw" placeholder="e.g. Worksheet 4, questions 1–10" aria-label="Homework">
+  <button class="go">Save homework</button><button type="button" id="no">No homework</button></form></div>`;
+  const finish=()=>{asked.push(p.key);saveAsked();save();render()};
+  $('af').onsubmit=e=>{
+    e.preventDefault();const w=$('aw').value.trim();if(!w)return;
+    const n=nextOf(p.l.s);
+    hw.push({id:Date.now(),s:p.l.s,w,due:n?n.t.getTime():Date.now()+864e5});finish();
+  };
+  $('no').onclick=finish;
+}
+function askNotify(){
+  try{
+    const p=pending();if(!p||Notification.permission!=='granted')return;
+    const m=p.key+' ask';if(sent.has(m))return;sent.add(m);
+    new Notification('Course planner',{body:p.l.s+' finished. What is the homework?'});
+  }catch(e){}
+}
+
+// exams
+let ex=[];
+try{ex=JSON.parse(localStorage.getItem('ex')||'[]')}catch(e){}
+const saveEx=()=>{try{localStorage.setItem('ex',JSON.stringify(ex))}catch(e){}};
+function daysTo(d){const n=new Date();return Math.round((new Date(d+'T00:00')-new Date(n.getFullYear(),n.getMonth(),n.getDate()))/864e5)}
+$('xf').onsubmit=e=>{
+  e.preventDefault();
+  ex.push({id:Date.now(),s:$('xs').value,w:$('xw').value.trim()||'Exam',date:$('xd').value});
+  saveEx();$('xw').value='';render();
+};
+function renderEx(){
+  const l=ex.filter(x=>daysTo(x.date)>=0).sort((a,b)=>a.date<b.date?-1:1);
+  $('exl').innerHTML=l.length?l.map(x=>{
+    const d=daysTo(x.date);
+    return `<li class="hwi"><div class="t"><span class="tag" style="background:${col(x.s)}">${esc(x.s)}</span><b>${esc(x.w)}</b>
+    <div class="due ${d<=3?'late':''}">${d===0?'Today':d===1?'Tomorrow':'In '+d+' days'} · ${new Date(x.date+'T00:00').toLocaleDateString(undefined,{day:'numeric',month:'short'})}</div></div>
+    <button class="x" data-e="${x.id}" aria-label="Delete exam">✕</button></li>`}).join(''):'<li class="empty">No exams added yet.</li>';
+  $('exl').querySelectorAll('[data-e]').forEach(b=>b.onclick=()=>{ex=ex.filter(x=>x.id!=b.dataset.e);saveEx();render()});
+}
+
+// editable schedule
+const saveL=()=>{try{localStorage.setItem('lessons',JSON.stringify(LESSONS))}catch(e){}};
+let editing=false;
+$('editS').onclick=()=>{editing=!editing;$('sched').hidden=!editing;$('editS').textContent=editing?'Done':'Edit schedule';renderSched()};
+function renderSched(){
+  if(!editing)return;
+  $('sl').innerHTML=LESSONS.map((l,i)=>({l,i})).sort((a,b)=>((a.l.d+1)%7)-((b.l.d+1)%7)||a.l.h-b.l.h)
+    .map(({l,i})=>`<li class="hwi"><div class="t"><span class="tag" style="background:${col(l.s)}">${esc(l.s)}</span>${DN[l.d]} ${range(l)}</div>
+    <button class="x" data-l="${i}" aria-label="Delete lesson">✕</button></li>`).join('')||'<li class="empty">No lessons yet.</li>';
+  $('sl').querySelectorAll('[data-l]').forEach(b=>b.onclick=()=>{LESSONS.splice(+b.dataset.l,1);saveL();render()});
+}
+$('sf').onsubmit=e=>{
+  e.preventDefault();
+  const [h,m]=$('ls').value.split(':').map(Number),l={d:+$('ld').value,s:$('lsub').value.trim(),h,m};
+  if($('le').value){const [eh,em]=$('le').value.split(':').map(Number);l.eh=eh;l.em=em}
+  LESSONS.push(l);saveL();$('lsub').value='';render();
+};
+function fillSubj(){
+  const v=$('subj').value,v2=$('xs').value,v3=$('dsub').value,v4=$('dfil').value;
+  const o=[...new Set(LESSONS.map(l=>l.s))].map(s=>`<option>${esc(s)}</option>`).join('');
+  $('subj').innerHTML=o;$('xs').innerHTML=o;$('dsub').innerHTML=o;$('tsub').innerHTML=o;$('gsub').innerHTML=o;
+  $('dfil').innerHTML='<option value="">All subjects</option>'+o;
+  if(v)$('subj').value=v;if(v2)$('xs').value=v2;if(v3)$('dsub').value=v3;if(v4)$('dfil').value=v4;
+}
+
+// tabs
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('nav button').forEach(x=>x.setAttribute('aria-pressed',x===b));
+  $('planTab').hidden=b.dataset.t!=='plan';$('docsTab').hidden=b.dataset.t!=='docs';$('annTab').hidden=b.dataset.t!=='ann';$('toolsTab').hidden=b.dataset.t!=='tools';
+});
+
+// one hour before a lesson: remind about homework still due
+function lessonText(n){
+  const due=hw.filter(x=>!x.done&&x.s===n.s);
+  return `${esc(n.s)} starts in ${Math.ceil((n.t-Date.now())/6e4)} min. `+(due.length?'Homework still due: '+due.map(x=>esc(x.w)).join(', '):'No homework due.');
+}
+function lessonNotify(){
+  try{
+    const n=nextAny();
+    if(!n||isAbs(n)||n.t-Date.now()>36e5||Notification.permission!=='granted')return;
+    const k=n.s+n.t.getTime();if(sent.has(k))return;sent.add(k);
+    new Notification('Lesson soon',{body:lessonText(n).replace(/&amp;/g,'&')});
+  }catch(e){}
+}
+
+// documents (files live in IndexedDB on this device)
+const idb=new Promise((res,rej)=>{
+  try{const r=indexedDB.open('planner',1);
+    r.onupgradeneeded=()=>{r.result.createObjectStore('meta',{keyPath:'id'});r.result.createObjectStore('blobs')};
+    r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)}catch(e){rej(e)}
+});
+const tx=(store,mode,fn)=>idb.then(d=>new Promise((res,rej)=>{
+  const t=d.transaction(store,mode),r=fn(t.objectStore(store));
+  t.oncomplete=()=>res(r.result);t.onerror=()=>rej(t.error);
+}));
+let dlist=[];
+const mb=n=>n>1048576?(n/1048576).toFixed(1)+' MB':Math.max(1,Math.round(n/1024))+' KB';
+tx('meta','readonly',s=>s.getAll()).then(l=>{dlist=l;renderDocs()}).catch(()=>{$('dnote').textContent='Storage is not available here, so documents cannot be saved.'});
+
+$('df').onsubmit=async e=>{
+  e.preventDefault();
+  const fs=[...$('dfile').files],name=$('dname').value.trim();
+  try{
+    for(const f of fs){
+      const id=Date.now()+'-'+Math.random().toString(36).slice(2,6);
+      await tx('blobs','readwrite',s=>s.put(f,id));
+      const m={id,s:$('dsub').value,name:(name&&fs.length===1)?name:f.name,type:f.type,size:f.size};
+      await tx('meta','readwrite',s=>s.put(m));dlist.push(m);
+    }
+    $('dfile').value='';$('dname').value='';$('dnote').textContent='Added. Files are stored on this device and browser only.';
+  }catch(err){$('dnote').textContent='Could not save that file. Storage may be full.'}
+  renderDocs();
+};
+$('dfil').onchange=renderDocs;
+function renderDocs(){
+  const f=$('dfil').value;
+  const l=dlist.filter(d=>!f||d.s===f).sort((a,b)=>a.s.localeCompare(b.s)||a.name.localeCompare(b.name));
+  $('dlist').innerHTML=l.length?l.map(d=>`<li class="hwi"><div class="t"><span class="tag" style="background:${col(d.s)}">${esc(d.s)}</span><b>${esc(d.name)}</b>
+  <div class="due">${d.type.startsWith('image')?'Image':'PDF'} · ${mb(d.size)}</div></div>
+  <button data-o="${d.id}">Open</button><button class="x" data-r="${d.id}" aria-label="Delete document">✕</button></li>`).join('')
+  :'<li class="empty">No documents yet. Add a book, PDF or image above.</li>';
+  $('dlist').querySelectorAll('[data-o]').forEach(b=>b.onclick=()=>openDoc(b.dataset.o));
+  $('dlist').querySelectorAll('[data-r]').forEach(b=>b.onclick=async()=>{
+    const id=b.dataset.r;
+    try{await tx('blobs','readwrite',s=>s.delete(id));await tx('meta','readwrite',s=>s.delete(id))}catch(e){}
+    dlist=dlist.filter(d=>d.id!==id);renderDocs();
+  });
+}
+let curURL='';
+async function openDoc(id){
+  const d=dlist.find(x=>x.id===id);
+  try{
+    const b=await tx('blobs','readonly',s=>s.get(id));if(!b)return;
+    curURL=URL.createObjectURL(b);
+    $('vtitle').textContent=d.name;
+    $('vbody').innerHTML=d.type.startsWith('image')?`<img src="${curURL}" alt="${esc(d.name)}">`
+      :`<iframe src="${curURL}" title="${esc(d.name)}"></iframe>`;
+    $('view').hidden=false;
+  }catch(e){$('dnote').textContent='Could not open that file.'}
+}
+const closeView=()=>{$('view').hidden=true;$('vbody').innerHTML='';if(curURL)URL.revokeObjectURL(curURL);curURL=''};
+$('vclose').onclick=closeView;
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('view').hidden)closeView()});
+
+// announcements: paste a teacher message, pull out homework and exams, review, then add
+const subjects=()=>[...new Set(LESSONS.map(l=>l.s))];
+const pad=n=>String(n).padStart(2,'0');
+const iso=d=>d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());
+const MON=['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'];
+function dateIn(line){
+  const t=new Date(),today=new Date(t.getFullYear(),t.getMonth(),t.getDate()),L=line.toLowerCase();
+  let m;
+  if(/\btoday\b/.test(L))return iso(today);
+  if(/\btomorrow\b/.test(L))return iso(new Date(today.getTime()+864e5));
+  const fix=d=>{if(d<today)d.setFullYear(d.getFullYear()+1);return iso(d)};
+  if(m=L.match(/\b(\d{1,2})(?:st|nd|rd|th)?\s*(?:of\s+)?(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)/))return fix(new Date(today.getFullYear(),MON.indexOf(m[2]),+m[1]));
+  if(m=L.match(/\b(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\s+(\d{1,2})\b/))return fix(new Date(today.getFullYear(),MON.indexOf(m[1]),+m[2]));
+  if(m=L.match(/\b(\d{1,2})[\/.-](\d{1,2})\b/))return fix(new Date(today.getFullYear(),+m[2]-1,+m[1]));
+  if(m=L.match(/\b(sun|mon|tue|wed|thu|fri|sat)[a-z]*\b/)){
+    const k=['sun','mon','tue','wed','thu','fri','sat'].indexOf(m[1]);
+    let add=(k-today.getDay()+7)%7;if(add===0)add=7;
+    return iso(new Date(today.getTime()+add*864e5));
+  }
+  return '';
+}
+function localParse(text){
+  const subs=subjects(),out=[];let cur=subs[0];
+  text.split(/\n+|(?<=[.!?])\s+/).forEach(line=>{
+    const s=subs.find(x=>new RegExp('\\b'+x+'\\b','i').test(line));if(s)cur=s;
+    const isEx=/\b(exam|test|quiz|mid-?term|final)\b/i.test(line);
+    const isHw=/\b(homework|hw|assignment|due|submit|worksheet|exercises?|read|complete|finish)\b/i.test(line);
+    if(isEx||isHw)out.push({type:isEx?'ex':'hw',s:cur,w:line.trim().slice(0,150),date:dateIn(line)});
+  });
+  return out;
+}
+async function aiParse(text){
+  const s=window.claude?await window.claude.use('sample'):null;
+  if(!s)return null;
+  const subs=subjects();
+  const r=await s.json(`Today is ${new Date().toDateString()}. The student's subjects: ${subs.join(', ')}. Extract the homework and exams from this teacher announcement. Return only JSON like {"items":[{"type":"homework" or "exam","subject":"one of the subjects","task":"short description","due":"YYYY-MM-DD or null if no date is given"}]}. Only include things the student must do or prepare for.\nAnnouncement:\n"""${text}"""`,{modelTier:'quick',cache:false});
+  return (r.items||[]).map(i=>({type:i.type==='exam'?'ex':'hw',s:subs.includes(i.subject)?i.subject:subs[0],w:String(i.task||'').slice(0,150),date:/^\d{4}-\d\d-\d\d$/.test(i.due||'')?i.due:''}));
+}
+$('aread').onclick=async()=>{
+  const t=$('atext').value.trim();if(!t)return;
+  $('astat').textContent='Reading…';let items=null,note='';
+  try{items=await aiParse(t)}catch(e){items=null}
+  if(!items){items=localParse(t);note=' (Read with simple rules, so double-check the details.)'}
+  if(!items.length){$('sugbox').hidden=true;$('astat').textContent="Couldn't find any homework or exams in that."+note;return}
+  const opts=subjects().map(s=>`<option>${esc(s)}</option>`).join('');
+  $('sgl').innerHTML=items.map(i=>`<li class="sg"><label class="full" style="flex-direction:row;gap:8px"><input type="checkbox" checked> Add this</label>
+  <select data-f="type"><option value="hw" ${i.type==='hw'?'selected':''}>Homework</option><option value="ex" ${i.type==='ex'?'selected':''}>Exam</option></select>
+  <select data-f="s">${opts.replace(`<option>${esc(i.s)}</option>`,`<option selected>${esc(i.s)}</option>`)}</select>
+  <input data-f="w" class="full" value="${esc(i.w).replace(/"/g,'&quot;')}" aria-label="Task">
+  <label class="full due">Due date (blank = next lesson)<input data-f="date" type="date" value="${i.date}"></label></li>`).join('');
+  $('sugbox').hidden=false;
+  $('astat').textContent=`Found ${items.length}. Check them, then add.`+note;
+};
+$('sadd').onclick=()=>{
+  let n=0,skip=0;
+  $('sgl').querySelectorAll('li').forEach(li=>{
+    if(!li.querySelector('[type=checkbox]').checked)return;
+    const g=f=>li.querySelector(`[data-f=${f}]`).value,type=g('type'),s=g('s'),w=g('w').trim()||'Task',date=g('date');
+    if(type==='ex'){if(!date){skip++;return}ex.push({id:Date.now()+n,s,w,date})}
+    else{const nx=nextOf(s);hw.push({id:Date.now()+n,s,w,due:date?new Date(date+'T23:59').getTime():(nx?nx.t.getTime():Date.now()+864e5),done:false})}
+    n++;li.remove();
+  });
+  save();saveEx();render();
+  if(!$('sgl').children.length){$('sugbox').hidden=true;$('atext').value=''}
+  $('astat').textContent=`Added ${n}.`+(skip?` ${skip} exam(s) need a date before they can be added.`:'');
+};
+
+// cancelled lessons
+let cancelled=[];
+try{cancelled=JSON.parse(localStorage.getItem('cancelled')||'[]')}catch(e){}
+const saveCan=()=>{try{localStorage.setItem('cancelled',JSON.stringify(cancelled.slice(-60)))}catch(e){}};
+
+// next 7 days
+function renderWk(){
+  const now=Date.now(),end=now+7*864e5,items=[];
+  hw.filter(x=>!x.done&&x.due<end).forEach(x=>items.push({t:x.due,s:x.s,w:x.w,k:'Homework'}));
+  ex.forEach(x=>{const d=daysTo(x.date);if(d>=0&&d<=7)items.push({t:new Date(x.date+'T09:00').getTime(),s:x.s,w:x.w,k:'Exam'})});
+  items.sort((a,b)=>a.t-b.t);
+  $('wk').innerHTML=items.length?items.map(i=>{
+    const late=i.k==='Homework'&&i.t<now;
+    return `<li class="hwi"><div class="t"><span class="tag" style="background:${col(i.s)}">${esc(i.s)}</span><b>${esc(i.w)}</b>
+    <div class="due ${late?'late':''}">${i.k} · ${late?'Overdue':dayLabel(new Date(i.t))}</div></div></li>`}).join(''):'<li class="empty">Nothing due in the next 7 days.</li>';
+}
+// streak of homework finished before its due time
+function renderStreak(){
+  let n=0;
+  for(const x of hw.filter(x=>x.done&&x.at).sort((a,b)=>b.at-a.at)){if(x.at<=x.due)n++;else break}
+  $('streak').textContent=n?`🔥 ${n} on time in a row`:'';
+}
+
+// study timer
+let study=[];
+try{study=JSON.parse(localStorage.getItem('study')||'[]')}catch(e){}
+const saveStudy=()=>{try{localStorage.setItem('study',JSON.stringify(study.slice(-500)))}catch(e){}};
+let tEnd=0,tSub='',tick=null;
+function stopTimer(){
+  if(!tick)return;
+  clearInterval(tick);tick=null;
+  const mins=Math.round((25*6e4-Math.max(0,tEnd-Date.now()))/6e4);
+  if(mins>=1){study.push({s:tSub,min:mins,at:Date.now()});saveStudy()}
+  $('tgo').textContent='Start 25 min';$('tclock').textContent='25:00';renderStudy();
+}
+$('tgo').onclick=()=>{
+  if(tick){stopTimer();return}
+  tSub=$('tsub').value;tEnd=Date.now()+25*6e4;$('tgo').textContent='Stop';
+  tick=setInterval(()=>{
+    const left=Math.max(0,tEnd-Date.now()),sec=Math.ceil(left/1000);
+    $('tclock').textContent=pad(Math.floor(sec/60))+':'+pad(sec%60);
+    if(left<=0){stopTimer();try{new Notification('Study timer',{body:'25 minutes done. Take a break!'})}catch(e){}}
+  },500);
+};
+function renderStudy(){
+  const since=Date.now()-7*864e5,tot={};
+  study.filter(x=>x.at>since).forEach(x=>tot[x.s]=(tot[x.s]||0)+x.min);
+  const k=Object.keys(tot);
+  $('tlog').innerHTML=k.length?'<li class="due">Last 7 days</li>'+k.map(s=>`<li class="hwi"><span class="tag" style="background:${col(s)}">${esc(s)}</span><b>${tot[s]} min</b></li>`).join(''):'<li class="empty">No study time logged yet.</li>';
+}
+
+// grades
+let gr=[];
+try{gr=JSON.parse(localStorage.getItem('gr')||'[]')}catch(e){}
+const saveGr=()=>{try{localStorage.setItem('gr',JSON.stringify(gr))}catch(e){}};
+$('gf').onsubmit=e=>{
+  e.preventDefault();
+  gr.push({id:Date.now(),s:$('gsub').value,w:$('gname').value.trim(),a:+$('gs').value,b:+$('gm').value});
+  saveGr();$('gname').value='';$('gs').value='';$('gm').value='';renderGr();
+};
+function renderGr(){
+  $('gl').innerHTML=gr.length?[...new Set(gr.map(g=>g.s))].map(s=>{
+    const l=gr.filter(g=>g.s===s),avg=Math.round(l.reduce((t,g)=>t+g.a/g.b*100,0)/l.length);
+    return `<li class="due" style="margin-top:8px"><span class="tag" style="background:${col(s)}">${esc(s)}</span><b>Average ${avg}%</b></li>`
+    +l.map(g=>`<li class="hwi"><div class="t"><b>${esc(g.w)}</b> <span class="due">${g.a}/${g.b} (${Math.round(g.a/g.b*100)}%)</span></div><button class="x" data-g="${g.id}" aria-label="Delete grade">✕</button></li>`).join('')
+  }).join(''):'<li class="empty">No grades yet.</li>';
+  $('gl').querySelectorAll('[data-g]').forEach(b=>b.onclick=()=>{gr=gr.filter(g=>g.id!=b.dataset.g);saveGr();renderGr()});
+}
+
+// backup + saving to your Claude account
+const snapshot=()=>JSON.stringify({hw,ex,lessons:LESSONS,asked,absent,cancelled,study,gr});
+function apply(d){
+  hw=d.hw||[];ex=d.ex||[];if(Array.isArray(d.lessons))LESSONS=d.lessons;
+  asked=d.asked||[];absent=d.absent||[];cancelled=d.cancelled||[];study=d.study||[];gr=d.gr||[];
+  save();saveEx();saveL();saveAsked();saveAbs();saveCan();saveStudy();saveGr();lastHead='';render();
+}
+$('bexp').onclick=()=>{
+  $('bk').value=snapshot();$('bk').select();
+  $('bnote').textContent='Copy this text and keep it somewhere safe, like a notes app or an email to yourself.';
+};
+$('bimp').onclick=()=>{
+  try{const d=JSON.parse($('bk').value);if(!d||typeof d!=='object')throw 0;apply(d);$('bnote').textContent='Restored.'}
+  catch(e){$('bnote').textContent="That doesn't look like a backup."}
+};
+let cloudRef=null,ready=false,syncing=false,lastJson='';
+function setSync(ok){
+  let ls=true;
+  try{localStorage.setItem('probe','1');localStorage.removeItem('probe')}catch(e){ls=false}
+  $('sync').textContent=ok?'✓ Your data is saved to your Claude account.'
+    :ls?'Saved on this device.'
+    :'This browser is blocking saving. Try Chrome or Safari.';
+}
+async function pull(){
+  if(!cloudRef)return;
+  try{
+    const snap=await cloudRef.get();
+    if(!snap.exists)return;
+    const j=snap.data().json;
+    if(j===lastJson)return;
+    if(lastJson!==''&&snapshot()!==lastJson)return; // you have edits that aren't uploaded yet
+    apply(JSON.parse(j));lastJson=snapshot();
+  }catch(e){}
+}
+async function syncTick(){
+  if(!cloudRef||!ready||syncing)return;
+  const j=snapshot();if(j===lastJson)return;
+  syncing=true;
+  try{await cloudRef.set({json:j,t:Date.now()});lastJson=j}catch(e){}
+  syncing=false;
+}
+(async()=>{
+  try{
+    if(!window.claude){setSync(false);return}
+    const [db,user]=await Promise.all([window.claude.use('db'),window.claude.use('user')]);
+    const id=user?await user.id():null;
+    if(!db||!id){setSync(false);return}
+    cloudRef=db.doc('data/users/'+id+'/planner');
+    await pull();ready=true;setSync(true);
+  }catch(e){setSync(false)}
+})();
+setInterval(syncTick,4000);
+document.addEventListener('visibilitychange',()=>{if(document.hidden)syncTick();else pull()});
+
+// theme: auto, light, dark
+const getTheme=()=>{try{return localStorage.getItem('theme')||''}catch(e){return ''}};
+function applyTheme(){
+  const t=getTheme();
+  if(t)document.documentElement.dataset.theme=t;else delete document.documentElement.dataset.theme;
+  $('theme').textContent=t==='dark'?'Dark':t==='light'?'Light':'Auto';
+}
+$('theme').onclick=()=>{
+  const t=getTheme(),n=t===''?'light':t==='light'?'dark':'';
+  try{localStorage.setItem('theme',n)}catch(e){}
+  applyTheme();
+};
+applyTheme();
+
+// class links (join button shows from 10 min before the lesson until it ends)
+const LINKS={};
+function renderJoin(){
+  const now=new Date(),y=now.getFullYear(),mo=now.getMonth(),da=now.getDate();
+  const hit=LESSONS.filter(l=>l.d===now.getDay()&&LINKS[l.s])
+    .map(l=>({l,t:new Date(y,mo,da,l.h,l.m),e:endOf(l,now)})).find(x=>now>=x.t-6e5&&now<x.e&&!isAbs({s:x.l.s,t:x.t}));
+  $('join').innerHTML=hit?`<a class="joinbtn" href="${LINKS[hit.l.s]}" target="_blank" rel="noopener">Join ${esc(hit.l.s)} class</a>`:'';
+  $('links').innerHTML=Object.keys(LINKS).length?'Class links: '+Object.keys(LINKS).map(s=>`<a href="${LINKS[s]}" target="_blank" rel="noopener">${esc(s)}</a>`).join(', '):'';
+}
+
+function render(){fillSubj();renderJoin();renderAsk();renderHero();renderHw();renderEx();renderWeek();renderSched();renderDocs();renderWk();renderStreak();renderStudy();renderGr();renderAlerts()}
+render();
+setInterval(renderHero,1000);
+setInterval(()=>{renderJoin();renderAsk();renderHw();renderAlerts();notify();askNotify();lessonNotify()},30000);
+</script>
+</body>
+</html>
